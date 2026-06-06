@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendJobDigest } from '@/lib/resend'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: Request) {
     // Authorization check (simplistic for now)
     const { searchParams } = new URL(request.url)

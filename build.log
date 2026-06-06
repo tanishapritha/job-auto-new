@@ -1,0 +1,29 @@
+
+> job-auto-new@0.1.0 build
+> next build
+
+▲ Next.js 16.2.7 (Turbopack)
+- Environments: .env.local
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.8s
+  Running TypeScript ...
+  Finished TypeScript in 4.4s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/6) ...
+  Generating static pages using 7 workers (1/6) 
+⨯ useSearchParams() should be wrapped in a suspense boundary at page "/login". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at S (C:\Users\tprit\PROJECTS\clients\job-auto-new\.next\server\chunks\ssr\node_modules_next_1iemwhs._.js:2:2692)
+    at r (C:\Users\tprit\PROJECTS\clients\job-auto-new\.next\server\chunks\ssr\node_modules_next_1iemwhs._.js:4:6760)
+    at C:\Users\tprit\PROJECTS\clients\job-auto-new\.next\server\chunks\ssr\_0n-4s10._.js:1:4443
+    at an (C:\Users\tprit\PROJECTS\clients\job-auto-new\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:84267)
+    at ai (C:\Users\tprit\PROJECTS\clients\job-auto-new\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:86086)
+    at al (C:\Users\tprit\PROJECTS\clients\job-auto-new\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:107860)
+    at as (C:\Users\tprit\PROJECTS\clients\job-auto-new\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:105275)
+    at aa (C:\Users\tprit\PROJECTS\clients\job-auto-new\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:84619)
+    at ai (C:\Users\tprit\PROJECTS\clients\job-auto-new\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:86135)
+    at ai (C:\Users\tprit\PROJECTS\clients\job-auto-new\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:104615)
+Error occurred prerendering page "/login". Read more: https://nextjs.org/docs/messages/prerender-error
+Export encountered an error on /login/page: /login, exiting the build.
+⨯ Next.js build worker exited with code: 1 and signal: null
