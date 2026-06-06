@@ -180,18 +180,6 @@ export default function PreferencesPage() {
                 </div>
             </div>
 
-            <div className="card border-danger/20 bg-danger/5">
-                <h3 className="text-lg font-bold text-danger">Danger Zone</h3>
-                <p className="text-sm text-text-muted mb-4">Deactivate your automation or delete your account data permanently.</p>
-                <div className="flex gap-4">
-                    <button className="btn border-danger text-danger bg-surface hover:bg-danger/5">
-                        Pause Automation
-                    </button>
-                    <button className="btn bg-danger text-white hover:bg-danger/90">
-                        Delete Account
-                    </button>
-                </div>
-            </div>
         </div>
     )
 }

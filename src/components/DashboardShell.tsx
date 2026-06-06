@@ -28,6 +28,8 @@ const navItems: NavItem[] = [
     { label: 'Status', href: '/dashboard/status', icon: Activity },
 ]
 
+export const dynamic = 'force-dynamic'
+
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const router = useRouter()
@@ -113,17 +115,13 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                         <h2 className="text-2xl font-bold text-text">
                             {navItems.find(item => item.href === pathname)?.label || 'Dashboard'}
                         </h2>
-                        <p className="text-text-muted text-sm">Welcome back to your job automation hub.</p>
+                        <p className="text-text-muted text-sm">Automating your search every day.</p>
                     </div>
 
                     <div className="flex items-center gap-4">
                         <button className="p-2 rounded-full hover:bg-surface border border-border relative">
                             <Bell className="w-5 h-5 text-text-muted" />
                             <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-bg"></span>
-                        </button>
-                        <div className="h-8 w-px bg-border"></div>
-                        <button className="btn btn-primary py-2 px-4 text-sm">
-                            Upgrade Pro
                         </button>
                     </div>
                 </header>
