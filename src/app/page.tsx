@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { Briefcase, Zap, Shield, Mail, ArrowRight } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-bg">

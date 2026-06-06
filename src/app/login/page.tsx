@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { Briefcase, Mail, Lock, ArrowRight } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 function LoginForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
