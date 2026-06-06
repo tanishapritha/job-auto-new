@@ -11,9 +11,12 @@ import {
     User,
     LogOut,
     Bell,
-    Loader2
+    Loader2,
+    Sun,
+    Moon
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { useTheme } from '@/components/ThemeProvider'
 
 interface NavItem {
     label: string
@@ -33,6 +36,7 @@ export const dynamic = 'force-dynamic'
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const router = useRouter()
+    const { theme, toggleTheme } = useTheme()
     const supabase = createClient()
     const [userData, setUserData] = useState<{ email?: string; full_name?: string } | null>(null)
     const [loading, setLoading] = useState(true)
@@ -115,10 +119,16 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                         <h2 className="text-2xl font-bold text-text">
                             {navItems.find(item => item.href === pathname)?.label || 'Dashboard'}
                         </h2>
-                        <p className="text-text-muted text-sm">Automating your search every day.</p>
+                        <p className="text-text-muted text-sm border-none">Automating your search every day.</p>
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2 rounded-full hover:bg-surface border border-border text-text-muted"
+                        >
+                            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                        </button>
                         <button className="p-2 rounded-full hover:bg-surface border border-border relative">
                             <Bell className="w-5 h-5 text-text-muted" />
                             <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-bg"></span>

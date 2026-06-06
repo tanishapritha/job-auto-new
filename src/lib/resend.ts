@@ -1,35 +1,77 @@
 import { Resend } from 'resend'
 
-export const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-export const sendJobDigest = async (to: string, jobs: any[]) => {
-    const jobListHtml = jobs.map(job => `
-    <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
-      <h3 style="margin: 0 0 5px 0; color: #3b82f6;">${job.title}</h3>
-      <p style="margin: 0 0 10px 0; font-weight: bold;">${job.company}</p>
-      <div style="font-size: 14px; color: #64748b;">
-        <span>📍 ${job.location}</span> | 
-        <span>💰 ${job.salary}</span> | 
-        <span>🔗 <a href="${job.link}" style="color: #3b82f6;">View Job</a></span>
+export async function sendJobDigest(email: string, jobs: any[], isPreferencesSet: boolean = true) {
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+  const preferencesUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/preferences`
+
+  let html = ''
+  let subject = ''
+
+  if (!isPreferencesSet) {
+    subject = '🚀 Action Required: Set your JobCrew preferences'
+    html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #6366f1;">Welcome to JobCrew!</h2>
+        <p>You haven't set your job preferences yet. To start receiving daily job matches, please tell us what you're looking for.</p>
+        <div style="margin: 30px 0;">
+          <a href="${preferencesUrl}" style="background-color: #6366f1; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">Set My Preferences</a>
+        </div>
+        <p style="color: #666; font-size: 14px;">Once set, we'll search for jobs starting tomorrow at 8:00 AM.</p>
       </div>
-    </div>
-  `).join('')
+    `
+  } else if (jobs.length === 0) {
+    subject = '📅 Daily Update: No new matches today'
+    html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #6366f1;">Daily Job Digest</h2>
+        <p>We searched for jobs matching your preferences but didn't find any new listings today.</p>
+        <p>We'll try again tomorrow morning!</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <a href="${dashboardUrl}" style="color: #6366f1; text-decoration: none;">View Dashboard</a>
+      </div>
+    `
+  } else {
+    subject = `🎯 ${jobs.length} New Job Matches for You`
+    const jobListings = jobs.map(job => `
+      <div style="padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px;">
+        <h3 style="margin: 0 0 5px 0; color: #111;">${job.title}</h3>
+        <p style="margin: 0; color: #666; font-size: 14px;">${job.company} • ${job.location}</p>
+        <div style="margin-top: 10px;">
+          <a href="${job.link}" style="color: #6366f1; text-decoration: none; font-size: 14px; font-weight: bold;">View Job Opening →</a>
+        </div>
+      </div>
+    `).join('')
 
-    return resend.emails.send({
-        from: process.env.EMAIL_FROM || 'JobCrew <updates@resend.dev>',
-        to: to,
-        subject: `Daily Job Digest: ${jobs.length} new matches`,
-        html: `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #0f172a;">Your Crew Found Matches!</h1>
-        <p style="color: #64748b;">Here are your top ${jobs.length} job matches for today based on your preferences.</p>
-        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-        ${jobListHtml}
-        <p style="font-size: 12px; color: #94a3b8; margin-top: 40px;">
-          You are receiving this because you signed up for Job Automation Crew. 
-          To change your preferences, visit your <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/preferences">Dashboard</a>.
+    html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;">
+        <h2 style="color: #6366f1; margin-bottom: 20px;">Your Daily Job Digest</h2>
+        <p style="margin-bottom: 30px; color: #444;">Here are today's top picks based on your preferences:</p>
+        
+        ${jobListings}
+
+        <div style="margin: 40px 0; text-align: center;">
+          <a href="${dashboardUrl}" style="background-color: #6366f1; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">Open Full Dashboard</a>
+        </div>
+        
+        <p style="color: #999; font-size: 12px; text-align: center;">
+          To change your targets, visit your <a href="${preferencesUrl}" style="color: #6366f1;">preferences</a>.
         </p>
       </div>
     `
-    })
+  }
+
+  const { data, error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM || 'JobCrew <onboarding@resend.dev>',
+    to: [email],
+    subject: subject,
+    html: html,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data
 }
