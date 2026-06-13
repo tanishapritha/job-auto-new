@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import { Briefcase, Mail, Lock, ArrowRight, Sun, Moon } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { useTheme } from '@/components/ThemeProvider'
 
 export const dynamic = 'force-dynamic'
 
 function LoginForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
+    const { theme, toggleTheme } = useTheme()
     const [isLogin, setIsLogin] = useState(true)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -75,7 +76,7 @@ function LoginForm() {
     }
 
     return (
-        <div className="card w-full max-w-[440px] px-8 py-10 shadow-2xl relative overflow-hidden backdrop-blur-sm border-white/5">
+        <div className="card w-full max-w-[440px] px-8 py-10 shadow-2xl relative overflow-hidden">
             <div className="flex items-center justify-between mb-10">
                 <div className="flex items-center gap-3">
                     <div className="bg-primary p-2 rounded-lg text-white shadow-lg shadow-primary/20">
@@ -83,8 +84,11 @@ function LoginForm() {
                     </div>
                     <h1 className="text-xl font-bold tracking-tight">Job Engine</h1>
                 </div>
-                <button className="p-2 rounded-lg hover:bg-white/5 text-text-muted transition-colors border border-white/5">
-                    <Sun className="w-5 h-5" />
+                <button 
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-text-muted transition-colors border border-border"
+                >
+                    {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
             </div>
 
@@ -93,8 +97,8 @@ function LoginForm() {
                     {isLogin ? 'Sign In' : 'Join the Force'}
                 </h2>
                 <p className="text-text-muted text-[15px]">
-                    {isLogin
-                        ? 'Access your autonomous search dashboard.'
+                    {isLogin 
+                        ? 'Access your autonomous search dashboard.' 
                         : 'Deploy your autonomous search agents today.'}
                 </p>
             </div>
@@ -106,40 +110,40 @@ function LoginForm() {
                     </div>
                 )}
 
-                <div className="input-group">
-                    <label>Email Address</label>
+                <div className="space-y-1.5">
+                    <label className="label">Email Address</label>
                     <input
                         type="email"
                         required
                         placeholder="jane@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full"
+                        className="input-field"
                     />
                 </div>
 
-                <div className="input-group">
-                    <label>Password</label>
+                <div className="space-y-1.5">
+                    <label className="label">Password</label>
                     <input
                         type="password"
                         required
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full"
+                        className="input-field"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="btn btn-primary w-full py-4 text-base font-bold shadow-lg shadow-primary/25 disabled:opacity-50"
+                    className="btn btn-primary w-full py-4 text-base font-bold disabled:opacity-50"
                 >
                     {loading ? 'Initializing...' : (isLogin ? 'Sign In to Dashboard' : 'Create Agent Account')}
                 </button>
             </form>
 
-            <div className="mt-10 pt-8 border-t border-white/5 text-center">
+            <div className="mt-10 pt-8 border-t border-border text-center">
                 <p className="text-sm text-text-muted">
                     {isLogin ? (
                         <>New to the engine? <button onClick={() => setIsLogin(false)} className="text-primary font-bold hover:underline">Register Free</button></>
@@ -148,11 +152,11 @@ function LoginForm() {
                     )}
                 </p>
             </div>
-
+            
             <div className="mt-6">
-                <button
+                <button 
                     onClick={handleGoogleLogin}
-                    className="btn btn-secondary w-full py-3.5 text-sm font-bold flex items-center justify-center gap-3 border-white/10 hover:border-white/20"
+                    className="btn btn-secondary w-full py-3.5 text-sm font-bold flex items-center justify-center gap-3"
                 >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -168,13 +172,15 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+    const { theme } = useTheme()
+    
     return (
-        <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#0f172a]">
+        <div className={`min-h-screen flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-200 ${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'}`}>
             {/* Radial Glow Effect */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] opacity-20"></div>
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[120px] transition-opacity duration-500 ${theme === 'dark' ? 'bg-primary/20 opacity-20' : 'bg-primary/5 opacity-40'}`}></div>
             </div>
-
+            
             <Suspense fallback={<div className="text-text-muted">Loading...</div>}>
                 <LoginForm />
             </Suspense>
