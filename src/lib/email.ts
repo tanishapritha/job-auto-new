@@ -1,17 +1,25 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+})
 
 export async function sendJobDigest(email: string, jobs: any[], isPreferencesSet: boolean = true) {
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
-  const preferencesUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/preferences`
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+    const preferencesUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/preferences`
 
-  let html = ''
-  let subject = ''
+    let html = ''
+    let subject = ''
 
-  if (!isPreferencesSet) {
-    subject = '🚀 Action Required: Set your JobCrew preferences'
-    html = `
+    if (!isPreferencesSet) {
+        subject = '🚀 Action Required: Set your JobCrew preferences'
+        html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
         <h2 style="color: #6366f1;">Welcome to JobCrew!</h2>
         <p>You haven't set your job preferences yet. To start receiving daily job matches, please tell us what you're looking for.</p>
@@ -21,9 +29,9 @@ export async function sendJobDigest(email: string, jobs: any[], isPreferencesSet
         <p style="color: #666; font-size: 14px;">Once set, we'll search for jobs starting tomorrow at 8:00 AM.</p>
       </div>
     `
-  } else if (jobs.length === 0) {
-    subject = '📅 Daily Update: No new matches today'
-    html = `
+    } else if (jobs.length === 0) {
+        subject = '📅 Daily Update: No new matches today'
+        html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
         <h2 style="color: #6366f1;">Daily Job Digest</h2>
         <p>We searched for jobs matching your preferences but didn't find any new listings today.</p>
@@ -32,9 +40,9 @@ export async function sendJobDigest(email: string, jobs: any[], isPreferencesSet
         <a href="${dashboardUrl}" style="color: #6366f1; text-decoration: none;">View Dashboard</a>
       </div>
     `
-  } else {
-    subject = `🎯 ${jobs.length} New Job Matches for You`
-    const jobListings = jobs.map(job => `
+    } else {
+        subject = `🎯 ${jobs.length} New Job Matches for You`
+        const jobListings = jobs.map(job => `
       <div style="padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px;">
         <h3 style="margin: 0 0 5px 0; color: #111;">${job.title}</h3>
         <p style="margin: 0; color: #666; font-size: 14px;">${job.company} • ${job.location}</p>
@@ -44,7 +52,7 @@ export async function sendJobDigest(email: string, jobs: any[], isPreferencesSet
       </div>
     `).join('')
 
-    html = `
+        html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;">
         <h2 style="color: #6366f1; margin-bottom: 20px;">Your Daily Job Digest</h2>
         <p style="margin-bottom: 30px; color: #444;">Here are today's top picks based on your preferences:</p>
@@ -60,18 +68,19 @@ export async function sendJobDigest(email: string, jobs: any[], isPreferencesSet
         </p>
       </div>
     `
-  }
+    }
 
-  const { data, error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM || 'JobCrew <onboarding@resend.dev>',
-    to: [email],
-    subject: subject,
-    html: html,
-  })
-
-  if (error) {
-    throw error
-  }
-
-  return data
+    try {
+        const info = await transporter.sendMail({
+            from: process.env.EMAIL_FROM || '"JobCrew" <updates@yourdomain.com>',
+            to: email,
+            subject: subject,
+            html: html,
+        })
+        console.log('Email sent successfully:', info.messageId)
+        return info
+    } catch (error) {
+        console.error('Failed to send email via SMTP:', error)
+        throw error
+    }
 }

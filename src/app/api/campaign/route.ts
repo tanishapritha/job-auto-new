@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendJobDigest } from '@/lib/resend'
+import { sendJobDigest } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,8 +44,17 @@ export async function GET(request: Request) {
                     ]
                 }
 
+                if (!p.email) {
+                    const { data: authUser } = await supabase.auth.admin.getUserById(p.id)
+                    p.email = authUser.user?.email
+                }
+
+                if (!p.email) {
+                    throw new Error('User email not found')
+                }
+
                 // Send email
-                await sendJobDigest(profile.email, jobs, isPreferencesSet)
+                await sendJobDigest(p.email, jobs, isPreferencesSet)
 
                 // Log success
                 await supabase.from('activity_logs').insert({

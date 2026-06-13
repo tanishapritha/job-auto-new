@@ -1,10 +1,13 @@
-import { task, schedules } from "@trigger.dev/sdk/v3";
+import { schedules } from "@trigger.dev/sdk/v3";
 
-export const dailyDigestTask = task({
-    id: "daily-digest",
-    run: async (payload: { timestamp: Date }) => {
+export const dailyDigestTask = schedules.task({
+    id: "daily-job-digest",
+    cron: "0 8 * * *", // 8:00 AM UTC
+    run: async (payload) => {
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
         const apiKey = process.env.TRIGGER_API_KEY;
+
+        console.log(`Starting scheduled daily digest at ${payload.timestamp}`);
 
         if (!apiKey) {
             throw new Error("TRIGGER_API_KEY is not defined");
@@ -22,10 +25,8 @@ export const dailyDigestTask = task({
             throw new Error(`Campaign failed: ${response.status} ${JSON.stringify(errorData)}`);
         }
 
-        return await response.json();
+        const result = await response.json();
+        console.log("Daily digest completed naturally:", result);
+        return result;
     },
 });
-
-// Note: In v3, schedules are often created via the dashboard or CLI,
-// but can also be defined in code using schedules.create or in the trigger.config.ts if supported.
-// For now, we define the task.
